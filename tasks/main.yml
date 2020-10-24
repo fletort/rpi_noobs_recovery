@@ -1,0 +1,25 @@
+---
+# tasks file for rpi-noobs-recovery
+- name: Configure NOOBS to recover the OS
+  block:
+    - name: Mount noobs partition
+      command: "mount -t vfat {{ noobs_partition }} {{ rpi_mount_path }}"
+      tags: notest
+
+  # - name: Copy OS package to install
+  # TODO : ADD a optional update feature of the selected os ? (difficul to manage version on http://downloads.raspberrypi.org/, only latest ?)
+  # Le plus simple avoir le direct path ou le télécharger.... et stocker ca dans un file (ou comparer je ne sais quoi)
+
+    - name: Force ssh on raspos reboot
+      copy:
+        content: ""
+        dest: "{{ raspos_ssh_file_path }}"
+      
+    - name: Update NOOBS command line to force install
+      include_tasks: cmdline_add_option.yml
+      loop: "{{ noobs_cmdline_to_add }}"
+        
+    - name: Reboot to start NOOBS auto install 
+      reboot:
+        reboot_timeout: 3600
+      tags: notest

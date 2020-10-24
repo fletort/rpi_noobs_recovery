@@ -1,0 +1,21 @@
+---
+# vars file for rpi-noobs-recovery
+
+# Mount location where NOOBS parition is mounted
+rpi_mount_path: /mnt
+
+# NOOBS cmdline filename
+noobs_cmdline_file: recovery.cmdline
+
+# NOOBS cmdline file fullpathname
+noobs_cmdline_file_path: "{{rpi_mount_path}}/{{noobs_cmdline_file}}" 
+
+# NOOBS option to add to the cmdline
+noobs_cmdline_to_add:
+  - silentinstall
+  - runinstaller
+
+# filename to add to force ssh on the raspos that will be installed
+raspos_ssh_file: ssh
+# fullpathname to the ssh file
+raspos_ssh_file_path: "{{rpi_mount_path}}/{{raspos_ssh_file}}" 

@@ -1,0 +1,7 @@
+---
+- name: Converge
+  hosts: all
+  tasks:
+    - name: "Include rpi-noobs-recovery"
+      include_role:
+        name: "rpi-noobs-recovery"

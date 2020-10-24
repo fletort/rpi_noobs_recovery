@@ -1,0 +1,3 @@
+---
+# defaults file for rpi-noobs-recovery
+noobs_partition: /dev/mmcblk0p1

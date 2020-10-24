@@ -1,0 +1,18 @@
+---
+# cmdline_add_option.yml
+- name: Check if {{ item }} is already defined
+  lineinfile: 
+    state: absent
+    dest: "{{ noobs_cmdline_file_path }}"
+    regex: "{{ item }}"
+  check_mode: yes
+  changed_when: false
+  register: check
+  failed_when: "'file not present' in check.msg"
+
+- name: Add {{ item }} option to command line
+  replace:
+    dest: "{{ noobs_cmdline_file_path }}"
+    regexp: '^(.*)$'
+    replace: '\1 {{ item }}'
+  when: not check.found

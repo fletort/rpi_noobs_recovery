@@ -1,0 +1,8 @@
+---
+- name: Prepare
+  hosts: rpi
+  tasks:
+    - name: "Prepare noobs fake partition working copy"
+      copy:
+        src: noobs_partition/
+        dest: /mnt/

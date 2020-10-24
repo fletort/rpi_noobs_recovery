@@ -1,0 +1,17 @@
+---
+dependency:
+  name: galaxy
+driver:
+  name: docker
+platforms:
+  - name: rpi
+    image: python:3-alpine
+lint: |
+  set -e
+  yamllint .
+  ansible-lint
+  flake8    
+provisioner:
+  name: ansible
+verifier:
+  name: testinfra
