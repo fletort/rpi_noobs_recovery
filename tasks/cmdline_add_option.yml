@@ -1,7 +1,7 @@
 ---
 # cmdline_add_option.yml
 - name: Check if {{ item }} is already defined
-  lineinfile: 
+  lineinfile:
     state: absent
     dest: "{{ noobs_cmdline_file_path }}"
     regex: "{{ item }}"

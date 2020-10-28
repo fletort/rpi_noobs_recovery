@@ -1,0 +1,53 @@
+---
+# tasks file to get information for requested os package
+# On output: the {{ requested_os_description }} variable contains the json 
+# entry for the requested os name {{ requested_os_name }}
+
+- name: Get Remote OS information
+  block:
+    - name: Create temporary directory for Remote package Information
+      tempfile:
+        state: directory
+        suffix: noobs_os_info
+      register: temp_dir
+
+    - name: Download repo server information
+      get_url:
+        url: "{{ item }}"
+        dest: "{{ temp_dir.path }}/{{ item | to_uuid }}_{{ item | basename }}"
+      with_items: "{{ noobs_repo_server }}"
+      register: temp_files
+
+    - name: Read Package Information
+      set_fact:
+        packages_info: "{{ packages_info | default({}) | combine(lookup('file', item.dest) | from_json) }}"
+      with_items: "{{ temp_files.results }}"
+
+    - name: Check for Requested Package Information - Filter By Name
+      set_fact:
+        requested_os_description_list: "{{ packages_info.os_list \
+          | selectattr('os_name', 'equalto', requested_os_name) \
+          | list }}"
+
+    - name: Check for Requested Package Information - Filter By Release Date (if defined)
+      set_fact:
+        requested_os_description_list: "{{ requested_os_description_list \
+          | selectattr('requested_os_description_list', 'equalto', requested_os_release_date) \
+          | list }}"
+      when: (requested_os_release_date is defined) and (requested_os_release_date != "latest")
+
+    - name: Failed if Requested Package Information is not available
+      fail:
+        msg: "The package '{{ requested_os_name }}' does not exists on given repo server."
+      when: (requested_os_description_list|length) == 0
+
+    - name: Failed if too much Package Information are found
+      fail:
+        msg: "More than 1 package information was foud for the package '{{ requested_os_name }}'."
+      when: (requested_os_description_list|length) > 1
+
+    - name: Save Requested Package Information
+      set_fact:
+        requested_os_description: "{{ requested_os_description_list | first }}"
+
+  delegate_to: localhost

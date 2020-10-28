@@ -1,3 +1,19 @@
 ---
-# defaults file for rpi-noobs-recovery
-noobs_partition: /dev/mmcblk0p1
+# Defines default value for overridable variable for rpi-noobs-recovery role
+# Please update Readme.md file when updating this file.
+
+# NOOBS main partition on the Raspberry Pi. Default value is /dev/mmcblk0p1
+noobs_main_partition: /dev/mmcblk0p1
+
+# List of NOOBS repository (url on os list file). Default value contains
+# the official noobs repo list.
+noobs_repo_server:
+  - "http://downloads.raspberrypi.org/os_list_v3.json"
+
+
+# OS name to install. Default Value is the "Raspberry Pi OS Lite (32-bit)"
+requested_os_name: "Raspberry Pi OS Lite (32-bit)"
+
+# OS release date (version) to install. Default value is "latest", 
+# to always auto update on last release.
+requested_os_release_date: "latest"
