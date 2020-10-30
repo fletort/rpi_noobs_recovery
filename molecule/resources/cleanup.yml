@@ -1,0 +1,9 @@
+---
+- name: Cleanup - Destroy Local NOOBS Repository Stub
+  hosts: localhost
+  connection: local
+  tasks:
+    - name: "Stop NOOBS Repository container"
+      docker_container:
+        name: noobs_repo
+        state: absent

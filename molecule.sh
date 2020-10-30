@@ -7,5 +7,7 @@ docker run --rm -it \
     -v /var/run/docker.sock:/var/run/docker.sock \
     -v ~/.cache/:/root/.cache/ \
     -w /tmp/$(basename "${PWD}") \
+    -e HOST_PWD=$(PWD) \
+    --name molecule \
     quay.io/ansible/molecule:3.0.6 \
     molecule "$@"

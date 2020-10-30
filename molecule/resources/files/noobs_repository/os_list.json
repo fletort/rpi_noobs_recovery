@@ -1,0 +1,163 @@
+{
+    "os_list": [
+        {
+            "description": "Stub for previous default os selected",
+            "download_size": 258296084,
+            "feature_level": 35120124,
+            "icon": "http://noobs_repo:8080/default/default.png",
+            "marketing_info": "http://noobs_repo:8080/default/marketing.tar",
+            "nominal_size": 1669,
+            "os_info": "http://noobs_repo:8080/default/os.json",
+            "os_name": "Raspberry Pi OS Lite (32-bit)",
+            "partition_setup": "http://noobs_repo:8080/default/partition_setup.sh",
+            "partitions_info": "http://noobs_repo:8080/default/partitions.json",
+            "release_date": "2020-05-20",
+            "supported_hex_revisions": "2,3,4,5,6,7,8,9,d,e,f,10,11,12,14,19,1040,1041,0092,0093,2082",
+            "supported_models": [
+                "Pi Model",
+                "Pi 2",
+                "Pi Zero",
+                "Pi 3",
+                "Pi Compute Module",
+                "Pi 4"
+            ],
+            "tarballs": [
+                "http://noobs_repo:8080/default/boot.tar.xz",
+                "http://noobs_repo:8080/default/root.tar.xz"
+            ]
+        },
+        {
+            "description": "Stub for lastest default os selected",
+            "download_size": 258296084,
+            "feature_level": 35120124,
+            "icon": "http://noobs_repo:8080/default/default.png",
+            "marketing_info": "http://noobs_repo:8080/default/marketing.tar",
+            "nominal_size": 1669,
+            "os_info": "http://noobs_repo:8080/default/os.json",
+            "os_name": "Raspberry Pi OS Lite (32-bit)",
+            "partition_setup": "http://noobs_repo:8080/default/partition_setup.sh",
+            "partitions_info": "http://noobs_repo:8080/default/partitions.json",
+            "release_date": "2020-08-20",
+            "supported_hex_revisions": "2,3,4,5,6,7,8,9,d,e,f,10,11,12,14,19,1040,1041,0092,0093,2082",
+            "supported_models": [
+                "Pi Model",
+                "Pi 2",
+                "Pi Zero",
+                "Pi 3",
+                "Pi Compute Module",
+                "Pi 4"
+            ],
+            "tarballs": [
+                "http://noobs_repo:8080/default/boot.tar.xz",
+                "http://noobs_repo:8080/default/root.tar.xz"
+            ]
+        },
+        {
+            "description": "My Fist Test Os Stub Updated",
+            "download_size": 258296084,
+            "feature_level": 35120124,
+            "icon": "http://noobs_repo:8080/test_os_1/test_os_1.png",
+            "marketing_info": "http://noobs_repo:8080/test_os_1/marketing.tar",
+            "nominal_size": 1669,
+            "os_info": "http://noobs_repo:8080/test_os_1/os.json",
+            "os_name": "Test OS 1",
+            "partition_setup": "http://noobs_repo:8080/test_os_1/partition_setup.sh",
+            "partitions_info": "http://noobs_repo:8080/test_os_1/partitions.json",
+            "release_date": "2020-08-20",
+            "supported_hex_revisions": "2,3,4,5,6,7,8,9,d,e,f,10,11,12,14,19,1040,1041,0092,0093,2082",
+            "supported_models": [
+                "Pi Model",
+                "Pi 2",
+                "Pi Zero",
+                "Pi 3",
+                "Pi Compute Module",
+                "Pi 4"
+            ],
+            "tarballs": [
+                "http://noobs_repo:8080/test_os_1/boot.tar.xz",
+                "http://noobs_repo:8080/test_os_1/root.tar.xz"
+            ]
+        },
+        {
+            "description": "My Second test Light Os Stub",
+            "nominal_size": 2112,
+            "os_info": "http://noobs_repo:8080/test_os_2/os.json",
+            "os_name": "Test Os 2",
+            "partitions_info": "http://noobs_repo:8080/test_os_2/partitions.json",
+            "release_date": "2019-11-09",
+            "supported_models": [
+                "Pi 3",
+                "Pi Compute Module 3"
+            ],
+            "tarballs": [
+                "http://noobs_repo:8080/test_os_2/boot.tar.xz",
+                "http://noobs_repo:8080/test_os_2/root.tar.xz"
+            ]
+        },
+        {
+            "description": "My Third test Os Stub with missing os_info",
+            "nominal_size": 2112,
+            "os_name": "Test Os 3",
+            "partitions_info": "http://noobs_repo:8080/test_os_3/partitions.json",
+            "release_date": "1998-07-12",
+            "supported_models": [
+                "Pi 3",
+                "Pi Compute Module 3"
+            ],
+            "tarballs": [
+                "http://noobs_repo:8080/test_os_3/boot.tar.xz",
+                "http://noobs_repo:8080/test_os_3/root.tar.xz"
+            ]
+        },
+        {
+            "description": "My Third test Os Stub with missings files",
+            "nominal_size": 2112,
+            "os_info": "http://noobs_repo:8080/test_os_3/os.json",
+            "os_name": "Test os missing file",
+            "partition_setup": "http://noobs_repo:8080/test_os_3/partition_setup.sh",
+            "partitions_info": "http://noobs_repo:8080/test_os_3/partitions.json",
+            "release_date": "1998-07-12",
+            "supported_models": [
+                "Pi 3",
+                "Pi Compute Module 3"
+            ],
+            "tarballs": [
+                "http://noobs_repo:8080/test_os_3/boot.tar.xz",
+                "http://noobs_repo:8080/test_os_3/root.tar.xz"
+            ]
+        },
+        {
+            "description": "My Third test Os Stub with missing tar",
+            "nominal_size": 2112,
+            "os_info": "http://noobs_repo:8080/test_os_4/os.json",
+            "os_name": "Test os missing tar",
+            "partitions_info": "http://noobs_repo:8080/test_os_4/partitions.json",
+            "release_date": "1998-07-12",
+            "supported_models": [
+                "Pi 3",
+                "Pi Compute Module 3"
+            ],
+            "tarballs": [
+                "http://noobs_repo:8080/test_os_4/boot.tar.xz",
+                "http://noobs_repo:8080/test_os_4/root.tar.xz"
+            ]
+        },
+        {
+            "description": "My wrong marketing tar test",
+            "marketing_info": "http://noobs_repo:8080/test_os_5/marketing.tar",
+            "nominal_size": 2112,
+            "os_info": "http://noobs_repo:8080/test_os_5/os.json",
+            "os_name": "Test os wrong marketing tar",
+            "partitions_info": "http://noobs_repo:8080/test_os_5/partitions.json",
+            "release_date": "2019-11-09",
+            "supported_models": [
+                "Pi 3",
+                "Pi Compute Module 3"
+            ],
+            "tarballs": [
+                "http://noobs_repo:8080/test_os_5/boot.tar.xz",
+                "http://noobs_repo:8080/test_os_5/root.tar.xz"
+            ]
+        }
+    ]
+}

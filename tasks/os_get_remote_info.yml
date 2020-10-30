@@ -6,9 +6,9 @@
 - name: Get Remote OS information
   block:
     - name: Create temporary directory for Remote package Information
-      tempfile:
+      file:
+        path: /tmp/noobs_os_info
         state: directory
-        suffix: noobs_os_info
       register: temp_dir
 
     - name: Download repo server information

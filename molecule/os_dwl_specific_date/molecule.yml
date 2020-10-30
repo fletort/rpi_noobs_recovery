@@ -25,13 +25,15 @@ provisioner:
         # Some action are taken about this variable in prepare.yml depending
         # the molecule execution context (natively or from docker container)
         noobs_repo_server: "http://noobs_repo:8080/os_list.json"
-        
-        # Specific test variable used by the prepare playbook
-        test_noobs_partition: "noobs_partition_mutiple_os/"
+        requested_os_name: "Test OS 1"
+        requested_os_release_date: "2020-08-20"
 
+        # Specific test variable used by the prepare playbook
+        test_noobs_partition: "noobs_partition/"
         # Specific test variable used by the tests
-        waited_os_dir: "raspios_lite_armhf"
+        waited_os_dir: "Test_OS_1"
         waited_os_date: "2020-08-20"
+
 verifier:
   name: testinfra
   options:

@@ -17,23 +17,31 @@ provisioner:
   name: ansible
   playbooks:
     prepare: ../resources/prepare.yml
-    converge: ../resources/converge.yml
+    converge: ../resources/converge_catch.yml
     cleanup: ../resources/cleanup.yml
+    verify: ../resources/verify.yml
   inventory:
     host_vars:
       rpi:
         # Some action are taken about this variable in prepare.yml depending
         # the molecule execution context (natively or from docker container)
         noobs_repo_server: "http://noobs_repo:8080/os_list.json"
-        
-        # Specific test variable used by the prepare playbook
-        test_noobs_partition: "noobs_partition_mutiple_os/"
+        requested_os_name: "unknow os"
 
-        # Specific test variable used by the tests
-        waited_os_dir: "raspios_lite_armhf"
-        waited_os_date: "2020-08-20"
+        # Specific test variable used by the prepare playbook
+        test_noobs_partition: "noobs_partition/"
+
+        # Specific test variable to check result
+        test_failure_from_converge: False
+        waited_failed_task_name: "Failed if Requested Package Name is not available"
+        waited_failed_result_msg: "The package 'unknow os' does not exists on given repo server."
+        waited_os_dir: "test_os_1"
+        waited_os_date: "2019-01-01"
+
 verifier:
   name: testinfra
   options:
     v: true
-  directory: ../resources/tests/
+  directory: ../resources/tests_err/
+  additional_files_or_dirs: 
+    - ../tests/test_os.py

@@ -16,7 +16,7 @@
       # this fill the requested_os_description variable
     - name: Get Release data available from os description
       set_fact:
-        requested_os_release_date: requested_os_description.release_date
+        requested_os_release_date: "{{ requested_os_description.release_date }}"
   when: requested_os_release_date == "latest"
 
 - name: Check/Clean OS local package(s)
