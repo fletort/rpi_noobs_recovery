@@ -22,6 +22,8 @@
 - name: Check/Clean OS local package(s)
   include_tasks: os_check.yml
   # this fill the local_package_description variable, if local package found
+  # TODO: fill list package to delete, to delete only when package found (if found below) and download ok. (HANDLER ?)
+  # TODO: all error test must check that SD CARD is as before start !!!!!
 
 - name: Download OS package if needed
   block:
@@ -40,6 +42,13 @@
 - name: Update NOOBS command line to force install
   include_tasks: cmdline_add_option.yml
   loop: "{{ noobs_cmdline_to_add }}"
+
+# Here all is ok. New Package is available locally, other package can be erased now.
+- name: Remove local OS Package(s) no more valid
+  file:
+    path: "{{ item.folder }}"
+    state: absent
+  with_items: "{{ local_packages_to_erase }}"
 
 - name: Reboot to start NOOBS auto install
   reboot:

@@ -32,10 +32,10 @@ noobs_att_prop_tarballs: "tarballs"
 
 # Map Noobs package file (json attribute) to their local file destination
 # as https://github.com/raspberrypi/noobs/blob/00822079b514e5db9dbd6e0e3c86628b94b4fa9a/recovery/mainwindow.cpp#L586
-noobs_pk_download_dest:
+noobs_att_to_dest_list:
   - {"attribute": "os_info", "dest": "os.json", "mandatory": true}
   - {"attribute": "partitions_info", "dest": "partitions.json", "mandatory": true}
-  - {"attribute": "{{ noobs_pk_prop_marketing }}", "dest": "{{ noobs_pk_dest_marketing_tar_file }}", "mandatory": false}
+  - {"attribute": "{{ noobs_att_prop_marketing }}", "dest": "{{ noobs_att_dest_marketing_tar_file }}", "mandatory": false}
   - {"attribute": "partition_setup", "dest": "partition_setup.sh", "mandatory": false}
   - {"attribute": "icon", "dest": "icon.png", "mandatory": false}
 

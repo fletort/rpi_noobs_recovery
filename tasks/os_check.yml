@@ -2,10 +2,17 @@
 # tasks file for checking if local os package update is needed or not 
 # (check local os vs remote selected package)
 # in case of, below we are supporting the fact that multipe os can be available
-# on the SD card when these tasks are executed. So a clean will be done.
-# On output: the {{ local_package_description }} variable contains the json 
+# on the SD card when these tasks are executed. 
+# So a list of directory to erase will be initialised.
+#
+# On output: 
+# - the {{ local_package_description }} variable contains the json 
 # entry of the local package corresponding to the requested os 
 # {{ requested_os_name }}, if found
+# - the {{ local_packages_to_erase }} variable returns the list
+# of local package that MUST be erased as soon as all is ok with 
+# new requested package. Attribute folder of this list can be used
+# to loop over sd card folder to delete
 
 # The third steps are Similar to the NOOBS ListImages 
 # https://github.com/raspberrypi/noobs/blob/00822079b514e5db9dbd6e0e3c86628b94b4fa9a/recovery/mainwindow.cpp#L490
@@ -61,9 +68,3 @@
   set_fact:
     local_package_description: "{{ local_packages_ok | first }}"
   when: (local_packages_ok|length) == 1
-
-- name: Remove local OS Package(s) not valid
-  file:
-    path: "{{ item.folder }}"
-    state: absent
-  with_items: "{{ local_packages_to_erase }}"
