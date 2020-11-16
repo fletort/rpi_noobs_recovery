@@ -1,0 +1,121 @@
+---
+# tasks file to download the os package described by the variable 
+# requested_os_description
+# similar to noob method on_actionWrite_image_to_disk_triggered
+# (https://github.com/raspberrypi/noobs/blob/00822079b514e5db9dbd6e0e3c86628b94b4fa9a/recovery/mainwindow.cpp#L586)
+# followed by startImageWrite method
+# (https://github.com/raspberrypi/noobs/blob/00822079b514e5db9dbd6e0e3c86628b94b4fa9a/recovery/mainwindow.cpp#L1537)
+#
+# The requested_os_description contains one json entry from an os_list global file.
+
+- name: Failed if a mandatory artifact is not defined
+  fail:
+    msg: "Mandatory artifact '{{ item.attribute }}' is missing."
+  when:
+    - item.mandatory
+    - requested_os_description[item.attribute] is not defined
+  with_items: "{{ noobs_att_to_dest_list }}"
+
+- name: Create OS Destination Directory Name
+  set_fact:
+    requested_os_dest: "{{ noobs_os_dir_path }}/{{ requested_os_description.os_name | replace(' ','_') }}"
+
+- name: Create OS Destination Directory
+  file:
+    path: "{{ requested_os_dest }}"
+    state: directory
+
+- name: Fill the OS Destination Directory
+  block:
+    # Download all mandatory artifacts and optional one that are defined
+    - name: Download artifacts
+      get_url:
+        url: "{{ requested_os_description[file.attribute] }}"
+        dest: "{{ requested_os_dest }}/{{ file.dest }}"
+      when: (file.mandatory) or (requested_os_description[file.attribute] is defined)
+      loop: "{{ noobs_att_to_dest_list }}"
+      loop_control:
+          loop_var: file
+
+    - name: Extract/Delete Marketing tarball with slides (if needed)
+      block:
+        - name: Install tar utility
+          package:
+            name: tar
+            state: present
+        - name: Extract Marketing tarball
+          unarchive:
+            src: "{{ requested_os_dest }}/{{ noobs_att_dest_marketing_tar_file }}"
+            dest: "{{ requested_os_dest }}"
+            remote_src: yes
+        - name: Delete Marketing tarball
+          file:
+            path: "{{ requested_os_dest }}/{{ noobs_att_dest_marketing_tar_file }}"
+            state: absent
+      when: requested_os_description[noobs_att_prop_marketing] is defined
+
+    # TODO: try to Insert tarball download URL information into partition_info.json ? (and not download them ?) (OPTION FOR THAT ?)
+    # as here https://github.com/raspberrypi/noobs/blob/00822079b514e5db9dbd6e0e3c86628b94b4fa9a/recovery/mainwindow.cpp#L1567
+    # i don't know if it is ok for a os in /os dir.. in the link this is a download os in /settings/os/
+    # should be: https://github.com/raspberrypi/noobs/blob/00822079b514e5db9dbd6e0e3c86628b94b4fa9a/recovery/multiimagewritethread.cpp#L449
+    - name: Download partition tarballs
+      get_url:
+        url: "{{ tar_path }}"
+        dest: "{{ requested_os_dest }}/{{ tar_path | basename }}"
+      loop: "{{ requested_os_description[noobs_att_prop_tarballs] }}"
+      loop_control:
+          loop_var: tar_path
+
+
+# Code below is used to have nicer error message on some possible errors
+  rescue:
+    # see bug https://github.com/ansible/ansible/issues/57399
+    - name: Define item-like variable to can use ansible_failed_task (linked to ansible issue 57399)
+      set_fact:
+        file: {attribute: "os_info", dest: "_"}
+        tar_path: 'fake/path'
+
+    - name: "Debug: Rescue on Task Failure"
+      debug:
+        msg: "failure on following task: {{ ansible_failed_task.name }}"
+
+    - name: "Clean: Erase the OS Destination Directory"
+      file:
+        path: "{{ requested_os_dest }}"
+        state: absent
+
+    - name: Failed during File Download
+      block:
+        - name: Build Friendly Error Message
+          set_fact:
+            failed_dwl_list: "{{ failed_dwl_list|default([]) + ['- ' + error.url + ' (' + error.response + ')'] }}"
+          when: error.failed is defined and error.failed
+          loop: "{{ ansible_failed_result.results }}"
+          loop_control:
+            loop_var: error
+          no_log: true
+
+        - name: Repository Download Error
+          debug:
+            msg: "{{ (failed_dwl_list|length == 1) \
+              | ternary(\
+                ['Repository Error. Following file can not be downloaded:'],\
+                ['Repository Error. Following files can not be downloaded:'])\
+               }} + {{ failed_dwl_list }}"
+          failed_when: true
+
+      when: (ansible_failed_task.name  == "Download artifacts") or (ansible_failed_task.name  == "Download partition tarballs")
+
+    - name: Repostiroy Marketing tarball Error
+      debug:
+        msg: "Archive {{ requested_os_description[noobs_att_prop_marketing] }} is not valid"
+      when: (ansible_failed_task.name  == "Extract Marketing tarball")
+      failed_when: true
+
+    - debug:
+        msg: "This failure is not managed rethrow it."
+
+    - name: "{{ ansible_failed_task.name }}"
+      debug:
+        msg: "{{ ansible_failed_result.msg }}"
+      failed_when: true

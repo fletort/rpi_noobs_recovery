@@ -1,0 +1,47 @@
+---
+dependency:
+  name: galaxy
+driver:
+  name: docker
+platforms:
+  - name: rpi
+    image: python:3-alpine
+    networks:
+      - name: molecule-test
+lint: |
+  set -e
+  yamllint .
+  ansible-lint
+  flake8    
+provisioner:
+  name: ansible
+  playbooks:
+    prepare: ../resources/prepare.yml
+    converge: ../resources/converge_catch.yml
+    cleanup: ../resources/cleanup.yml
+    verify: ../resources/verify.yml
+  inventory:
+    host_vars:
+      rpi:
+        # Some action are taken about this variable in prepare.yml depending
+        # the molecule execution context (natively or from docker container)
+        noobs_repo_server: 
+          - "http://noobs_repo:8080/os_list_double.json"
+        requested_os_name: "Test OS 1"
+        requested_os_release_date: "2019-01-01"
+
+        # Specific test variable used by the prepare playbook
+        test_noobs_partition: "noobs_partition_double/"
+
+        # Specific test variable to check result
+        test_failure_from_converge: False
+        waited_failed_task_name: "Failed if too much local Packages are selected"
+        waited_failed_result_msg: "More than 1 local package is selected."
+        waited_os_dir: "test_os_1"
+        waited_os_date: "2019-01-01"
+
+verifier:
+  name: testinfra
+  options:
+    v: true
+  directory: ../resources/tests_err/

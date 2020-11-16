@@ -1,0 +1,57 @@
+---
+- name: Converge
+  hosts: all
+  tasks:
+    - block:
+        - name: "Include rpi-noobs-recovery"
+          include_role:
+            name: "rpi-noobs-recovery"
+      rescue:
+
+        - name: Stop here if failure are not waited/tested on this scenario/host.
+          fail:
+            msg: "Failure is not waited in this test. Aborting"
+          when:
+            - waited_failed_task_name is not defined
+            - waited_failed_result_msg is not defined
+
+        # Need to re-define some (constant) variable (from /vars) to can use ansible_failed_task variable
+        # see bug https://github.com/ansible/ansible/issues/49942
+        - name: ReDefine role constant variable to can use ansible_failed_task (linked to ansible issue 49942)
+          include_vars:
+            file: ../../vars/main.yml
+
+        # Need to define also some internal task variable
+        # when failing in a task with a loop item variable must be defined
+        # the problem, is when this item is a dictionnary, attributed accessed from 
+        # the task must also be defined. Difficult to find a dynamic workaround for that....
+        # see bug https://github.com/ansible/ansible/issues/57399
+        - name: Define item variable to can use ansible_failed_task (linked to ansible issue 57399)
+          set_fact:
+            item: {attribute: "os_info", dest: "_"}
+        
+        - name: Save Failure Information To Manage them from verify step
+          copy: 
+            content: '{"task_name": "{{ ansible_failed_task.name }}", "return": {{ ansible_failed_result }} }'
+            dest: "{{ lookup('env', 'MOLECULE_EPHEMERAL_DIRECTORY') }}/failure_{{ inventory_hostname }}.json"
+          when: (test_failure_from_converge is not defined) or (test_failure_from_converge == False)
+          changed_when: "'molecule-idempotence-notest' not in ansible_skip_tags"
+          delegate_to: localhost
+        
+        - name: Test Failure Task Name From Converge
+          assert: 
+            that: ansible_failed_task.name == waited_failed_task_name
+            fail_msg: "Catched Failing task '{{ ansible_failed_task.name }}' is not the waited one {{ waited_failed_task_name }}."
+            success_msg: "Failed Task is the waited one"
+          when:
+            - test_failure_from_converge
+            - waited_failed_task_name is defined
+
+        - name: Test Failure Task Message From Converge
+          assert:
+            that: ansible_failed_result.msg == waited_failed_result_msg
+            fail_msg: "Catched error message is not the waited one."
+            success_msg: "Failed Task is the waited one"
+          when:
+            - test_failure_from_converge
+            - waited_failed_result_msg is defined

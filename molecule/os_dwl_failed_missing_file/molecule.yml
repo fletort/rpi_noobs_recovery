@@ -1,0 +1,65 @@
+---
+dependency:
+  name: galaxy
+driver:
+  name: docker
+platforms:
+  - name: rpi
+    image: python:3-alpine
+    networks:
+      - name: molecule-test
+lint: |
+  set -e
+  yamllint .
+  ansible-lint
+  flake8    
+provisioner:
+  name: ansible
+  playbooks:
+    prepare: ../resources/prepare.yml
+    converge: ../resources/converge_catch.yml
+    cleanup: ../resources/cleanup.yml
+  inventory:
+    host_vars:
+      rpi:
+        # Some action are taken about this variable in prepare.yml depending
+        # the molecule execution context (natively or from docker container)
+        noobs_repo_server: "http://noobs_repo:8080/os_list.json"
+        requested_os_name: "Test os missing file"
+
+        # Specific test variable used by the prepare playbook
+        test_noobs_partition: "noobs_partition/"
+
+        # Specific test variable to check result
+        test_failure_from_converge: False
+        waited_failed_task_name: "Repository Download Error"
+        waited_failed_result_msg:
+          - "Repository Error. Following files can not be downloaded:"
+          - "- http://noobs_repo:8080/test_os_3/os.json (HTTP Error 404: Not Found)"
+          - "- http://noobs_repo:8080/test_os_3/partition_setup.sh (HTTP Error 404: Not Found)"
+        waited_os_dir: "test_os_1"
+        waited_os_date: "2019-01-01"
+
+verifier:
+  name: testinfra
+  options:
+    vvv: true
+  directory: ../resources/tests_err/
+  additional_files_or_dirs: 
+    - ../tests/test_os.py
+
+scenario:
+  test_sequence:
+    #- dependency
+    - lint
+    - cleanup
+    - destroy
+    #- syntax
+    - create
+    - prepare
+    - converge
+    #- idempotence
+    #- side_effect
+    - verify
+    - cleanup
+    - destroy

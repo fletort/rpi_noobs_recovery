@@ -1,0 +1,55 @@
+---
+- name: Prepare - Patch rpi Docker image
+  hosts: rpi
+  tasks:
+    - name: "Add NOOBS partition working copy (replace the no tested mount)"
+      copy:
+        src: "{{ test_noobs_partition | default('noobs_partition/', True) }}"
+        dest: /mnt/
+
+    - name: Alter noobs_repo_server variable when molecule is executed on the host
+      # Remote Info download is delegated to localhost. This one needs to be able to download os list
+      # If molecule is execute natively on the host, "noobs_repo" host can not be reach by its hostname
+      # its port must be mapped to the localhost, then the os_list file will be accessed through this 
+      # localhost port
+      set_fact:
+        noobs_repo_server: "{{ noobs_repo_server | regex_replace('noobs_repo:8080', 'localhost:'+lookup('env', 'HOST_PORT') | default('8080', True)) }}"
+      when: (ansible_facts.virtualization_type is not defined) or (ansible_facts.virtualization_type != 'docker')
+
+
+- name: Prepare - Localhost Actions
+  hosts: localhost
+  connection: local
+  tasks:
+
+    - name: Start NOOBS Repository container
+      docker_container:
+        name: noobs_repo
+        image: halverneus/static-file-server:v1.8.1
+        # mapping of port 8080 to localhost:HOST_PORT is needed only if molcule is executed natively
+        # HOST_PORT is 8080 if not defined
+        ports: "{{ (molecule_in_docker) | ternary([], lookup('env', 'HOST_PORT') | default('8080', True)+':8080') }}"
+        # working directory can be HOST_PWD (molecule executed in docker 
+        # context (docker in docker)) or playbook_dir (native molecule execution)
+        #volumes: "{{ lookup('env', 'HOST_PWD') | default(playbook_dir, True) }}/molecule/default/files/noobs_repository:/web:ro"
+        volumes: "{{ (molecule_in_docker) | ternary(lookup('env', 'HOST_PWD'), playbook_dir) }}/molecule/resources/files/noobs_repository:/web:ro"
+        networks_cli_compatible: yes
+        networks:
+          - name: molecule-test
+      register: result
+      vars:
+        molecule_in_docker: (ansible_facts.virtualization_type is defined) and (ansible_facts.virtualization_type == 'docker')
+
+    - name: Prepare - Patch Needed if molecule is executed in docker
+      block:
+        # Remote Info download is delegated to localhost. This one needs to be able to download os list
+        # If molecule is execute in a docker container, this container must be added to the network
+        # dedicated to the test session.
+        - name: Attach Molecule Container to the Docker Network
+          docker_network:
+            name: molecule-test
+            connected:
+              - molecule
+            appends: yes
+      # when molecule is executed in a container
+      when: (ansible_facts.virtualization_type is defined) and (ansible_facts.virtualization_type == 'docker')

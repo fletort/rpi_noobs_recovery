@@ -1,25 +1,56 @@
 ---
 # tasks file for rpi-noobs-recovery
-- name: Configure NOOBS to recover the OS
+- name: Mount noobs partition
+  mount:
+    path: "{{ rpi_mount_path }}"
+    src: "{{ noobs_partition }}"
+    fstype: vfat
+    state: mounted
+    boot: no
+  tags: notest
+
+- name: Get Latest Release Date information from repository for OS {{ requested_os_name }}
   block:
-    - name: Mount noobs partition
-      command: "mount -t vfat {{ noobs_partition }} {{ rpi_mount_path }}"
-      tags: notest
+    - name: Get Information for Requested OS from defined repository
+      include_tasks: os_get_remote_info.yml
+      # this fill the requested_os_description variable
+    - name: Get Release data available from os description
+      set_fact:
+        requested_os_release_date: "{{ requested_os_description.release_date }}"
+  when: requested_os_release_date == "latest"
 
-  # - name: Copy OS package to install
-  # TODO : ADD a optional update feature of the selected os ? (difficul to manage version on http://downloads.raspberrypi.org/, only latest ?)
-  # Le plus simple avoir le direct path ou le télécharger.... et stocker ca dans un file (ou comparer je ne sais quoi)
+- name: Check/Clean OS local package(s)
+  include_tasks: os_check.yml
+  # this fill the local_package_description variable, if local package found
+  # TODO: fill list package to delete, to delete only when package found (if found below) and download ok. (HANDLER ?)
+  # TODO: all error test must check that SD CARD is as before start !!!!!
 
-    - name: Force ssh on raspos reboot
-      copy:
-        content: ""
-        dest: "{{ raspos_ssh_file_path }}"
-      
-    - name: Update NOOBS command line to force install
-      include_tasks: cmdline_add_option.yml
-      loop: "{{ noobs_cmdline_to_add }}"
-        
-    - name: Reboot to start NOOBS auto install 
-      reboot:
-        reboot_timeout: 3600
-      tags: notest
+- name: Download OS package if needed
+  block:
+    - name: Get Information for Requested OS (if not already done)
+      include_tasks: os_get_remote_info.yml
+      when: requested_os_description is not defined
+    - name: Download OS
+      include_tasks: os_download.yml
+  when: local_package_description is not defined
+
+- name: Force ssh on raspos reboot
+  copy:
+    content: ""
+    dest: "{{ raspos_ssh_file_path }}"
+
+- name: Update NOOBS command line to force install
+  include_tasks: cmdline_add_option.yml
+  loop: "{{ noobs_cmdline_to_add }}"
+
+# Here all is ok. New Package is available locally, other package can be erased now.
+- name: Remove local OS Package(s) no more valid
+  file:
+    path: "{{ item.folder }}"
+    state: absent
+  with_items: "{{ local_packages_to_erase }}"
+
+- name: Reboot to start NOOBS auto install
+  reboot:
+    reboot_timeout: 3600
+  tags: notest

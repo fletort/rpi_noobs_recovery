@@ -1,0 +1,70 @@
+---
+# tasks file for checking if local os package update is needed or not 
+# (check local os vs remote selected package)
+# in case of, below we are supporting the fact that multipe os can be available
+# on the SD card when these tasks are executed. 
+# So a list of directory to erase will be initialised.
+#
+# On output: 
+# - the {{ local_package_description }} variable contains the json 
+# entry of the local package corresponding to the requested os 
+# {{ requested_os_name }}, if found
+# - the {{ local_packages_to_erase }} variable returns the list
+# of local package that MUST be erased as soon as all is ok with 
+# new requested package. Attribute folder of this list can be used
+# to loop over sd card folder to delete
+
+# The third steps are Similar to the NOOBS ListImages 
+# https://github.com/raspberrypi/noobs/blob/00822079b514e5db9dbd6e0e3c86628b94b4fa9a/recovery/mainwindow.cpp#L490
+
+- name: Get available os package(s) on the SD card
+  find:
+    paths: "{{ noobs_os_dir_path }}"
+    recurse: true
+    file_type: file
+    patterns: 'os.json'
+  register: os_descriptor_list
+
+- name: Download SD card os package descriptor(s) content locally
+  slurp:
+    src: "{{ item.path }}"
+  with_items: "{{ os_descriptor_list.files }}"
+  register: os_descriptor_content
+
+- name: Parse Package(s) Information
+  set_fact:
+    local_packages_info: "{{ local_packages_info | default([]) + \
+      [item.content | b64decode | from_json \
+      | combine({ 'folder': item.source | dirname })] }}"
+  with_items: "{{ os_descriptor_content.results }}"
+
+- name: Check Package(s) vs Requested OS Name
+  set_fact:
+    local_packages_to_erase: "{{ local_packages_info | default({}) \
+      | rejectattr('name', 'equalto', requested_os_name) \
+      | list }}"
+    local_packages_ok: "{{ local_packages_info | default({}) \
+      | selectattr('name', 'equalto', requested_os_name) \
+      | list }}"
+
+# TODO : une seule étape ? car requested_os_release_date toujours définie ?
+- name: Check Package(s) vs Requested OS Release Date
+  set_fact:
+    local_packages_to_erase: "{{ local_packages_to_erase | default({}) + \
+      local_packages_ok \
+      | rejectattr('release_date', 'equalto', requested_os_release_date) \
+      | list }}"
+    local_packages_ok: "{{ local_packages_ok \
+      | selectattr('release_date', 'equalto', requested_os_release_date) \
+      | list }}"
+  when: requested_os_release_date is defined
+
+- name: Failed if too much local Packages are selected
+  fail:
+    msg: "More than 1 local package is selected."
+  when: (local_packages_ok|length) > 1
+
+- name: Save Local Package Information
+  set_fact:
+    local_package_description: "{{ local_packages_ok | first }}"
+  when: (local_packages_ok|length) == 1

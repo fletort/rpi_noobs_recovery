@@ -1,0 +1,52 @@
+{
+    "os_list": [
+        {
+            "description": "My Second test Os Stub",
+            "nominal_size": 2112,
+            "os_info": "http://noobs_repo:8080/test_os_2/os.json",
+            "os_name": "Test OS 2",
+            "partitions_info": "http://noobs_repo:8080/test_os_2/partitions.json",
+            "release_date": "2019-11-09",
+            "supported_models": [
+                "Pi 3",
+                "Pi Compute Module 3"
+            ],
+            "tarballs": [
+                "http://noobs_repo:8080/test_os_2/boot.tar.xz",
+                "http://noobs_repo:8080/test_os_2/root.tar.xz"
+            ]
+        },
+        {
+            "description": "My Latest Version of Second test Os Stub",
+            "nominal_size": 2112,
+            "os_info": "http://noobs_repo:8080/test_os_2/os.json",
+            "os_name": "Test OS 2",
+            "partitions_info": "http://noobs_repo:8080/test_os_2/partitions.json",
+            "release_date": "2020-01-19",
+            "supported_models": [
+                "Pi 3",
+                "Pi Compute Module 3"
+            ],
+            "tarballs": [
+                "http://noobs_repo:8080/test_os_2/boot.tar.xz",
+                "http://noobs_repo:8080/test_os_2/root.tar.xz"
+            ]
+        },
+        {
+            "description": "My Duplicate Latest Version of Second test Os Stub",
+            "nominal_size": 2112,
+            "os_info": "http://noobs_repo:8080/test_os_2/os.json",
+            "os_name": "Test OS 2",
+            "partitions_info": "http://noobs_repo:8080/test_os_2/partitions.json",
+            "release_date": "2020-01-19",
+            "supported_models": [
+                "Pi 3",
+                "Pi Compute Module 3"
+            ],
+            "tarballs": [
+                "http://noobs_repo:8080/test_os_2/boot.tar.xz",
+                "http://noobs_repo:8080/test_os_2/root.tar.xz"
+            ]
+        }
+    ]
+}

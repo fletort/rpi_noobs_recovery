@@ -1,0 +1,75 @@
+---
+# tasks file to get information for requested os package
+# On output: the {{ requested_os_description }} variable contains the json 
+# entry for the requested os name {{ requested_os_name }}
+
+- name: Get Remote OS information
+  block:
+    - name: Create temporary directory for Remote package Information
+      file:
+        path: /tmp/noobs_os_info
+        state: directory
+      register: temp_dir
+
+    - name: Download repo server information
+      get_url:
+        url: "{{ item }}"
+        dest: "{{ temp_dir.path }}/{{ item | to_uuid }}_{{ item | basename }}"
+      with_items: "{{ noobs_repo_server }}"
+      register: temp_files
+
+    - name: Get all Packages Information
+      set_fact:
+        packages_info: "{{ packages_info | default({}) | combine(lookup('file', item.dest) | from_json) }}"
+      with_items: "{{ temp_files.results }}"
+      #TODO: combine --> union ?!
+
+    - name: Filter with specified package Name
+      set_fact:
+        requested_os_description_list: "{{ packages_info.os_list \
+          | selectattr('os_name', 'equalto', requested_os_name) \
+          | list }}"
+
+    - name: Failed if Requested Package Name is not available
+      fail:
+        msg: "The package '{{ requested_os_name }}' does not exists on given repo server."
+      when: (requested_os_description_list|length) == 0
+
+    - name: Filter with specified Release Date (if defined) and Failed if not found
+      block:
+        - name: Filter with specified Release Date
+          set_fact:
+            requested_os_description_list: "{{ requested_os_description_list \
+              | selectattr('release_date', 'equalto', requested_os_release_date) \
+              | list }}"
+        - name: Failed if Requested Package Release is not available
+          fail:
+            msg: "The package release '{{ requested_os_release_date }}' of os '{{ requested_os_name }}' does not exists on given repo server."
+          when: (requested_os_description_list|length) == 0
+      when: (requested_os_release_date is defined) and (requested_os_release_date != "latest")
+
+    - name: Get Only Latest Release
+      set_fact:
+        requested_os_description_list: "{{ requested_os_description_list \
+          | selectattr('release_date', 'equalto', (\
+              requested_os_description_list \
+              | sort(attribute='release_date', reverse=True) \
+              | map(attribute='release_date')
+              | first
+              ) \
+            ) \
+          | list }}"
+      when:
+        - (requested_os_release_date is not defined) or (requested_os_release_date == "latest")
+        - requested_os_description_list|length > 1
+
+    - name: Failed if too much Package available
+      fail:
+        msg: "More than 1 package is available for the release '{{ requested_os_release_date }}' of os '{{ requested_os_name }}'."
+      when: (requested_os_description_list|length) > 1
+
+    - name: Save Requested Package Information
+      set_fact:
+        requested_os_description: "{{ requested_os_description_list | first }}"
+
+  delegate_to: localhost
