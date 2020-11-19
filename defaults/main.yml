@@ -3,7 +3,7 @@
 # Please update Readme.md file when updating this file.
 
 # NOOBS main partition on the Raspberry Pi. Default value is /dev/mmcblk0p1
-noobs_main_partition: /dev/mmcblk0p1
+noobs_partition: /dev/mmcblk0p1
 
 # List of NOOBS repository (url on os list file). Default value contains
 # the official noobs repo list.
