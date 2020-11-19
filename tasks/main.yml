@@ -50,7 +50,15 @@
     state: absent
   with_items: "{{ local_packages_to_erase }}"
 
+- name: Force no FingerPrint and no HostKey Checking on next SSH cnx
+  set_fact:
+    ansible_ssh_extra_args: '-o StrictHostKeyChecking=no -o userknownhostsfile=/dev/null'
+
 - name: Reboot to start NOOBS auto install
   reboot:
-    reboot_timeout: 3600
+    connect_timeout: 60
+    reboot_timeout: 1200
+    pre_reboot_delay: 0
+    post_reboot_delay: 30
   tags: notest
+  
