@@ -1,0 +1,5 @@
+---
+- hosts: rpi
+  roles:
+    - role: "{{ playbook_dir }}/../"
+      become: yes

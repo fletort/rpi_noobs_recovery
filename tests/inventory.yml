@@ -1,0 +1,8 @@
+rpi:
+  hosts:
+    rpi-test:
+      ansible_host: "{{ lookup('env','RPI_TEST_HOST')|default('rpi-test') }}"
+      ansible_user: "{{ lookup('env','RPI_TEST_SSH_USER')|default('pi') }}"
+      ansible_password: "{{ lookup('env','RPI_TEST_SSH_PASSWORD')|default('raspberry') }}"
+      #ansible_ssh_extra_args: '-o StrictHostKeyChecking=no -o userknownhostsfile=/dev/null'
+
