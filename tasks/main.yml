@@ -7,7 +7,7 @@
     fstype: vfat
     state: mounted
     boot: no
-  tags: notest
+  tags: molecule-converge-notest
 
 - name: Get Latest Release Date information from repository for OS {{ requested_os_name }}
   block:
@@ -60,5 +60,4 @@
     reboot_timeout: 1200
     pre_reboot_delay: 0
     post_reboot_delay: 30
-  tags: notest
-  
+  tags: molecule-converge-notest
