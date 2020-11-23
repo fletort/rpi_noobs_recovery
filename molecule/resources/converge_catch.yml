@@ -29,17 +29,17 @@
         - name: Define item variable to can use ansible_failed_task (linked to ansible issue 57399)
           set_fact:
             item: {attribute: "os_info", dest: "_"}
-        
+
         - name: Save Failure Information To Manage them from verify step
-          copy: 
+          copy:
             content: '{"task_name": "{{ ansible_failed_task.name }}", "return": {{ ansible_failed_result }} }'
             dest: "{{ lookup('env', 'MOLECULE_EPHEMERAL_DIRECTORY') }}/failure_{{ inventory_hostname }}.json"
-          when: (test_failure_from_converge is not defined) or (test_failure_from_converge == False)
+          when: (test_failure_from_converge is not defined) or (not test_failure_from_converge)
           changed_when: "'molecule-idempotence-notest' not in ansible_skip_tags"
           delegate_to: localhost
-        
+
         - name: Test Failure Task Name From Converge
-          assert: 
+          assert:
             that: ansible_failed_task.name == waited_failed_task_name
             fail_msg: "Catched Failing task '{{ ansible_failed_task.name }}' is not the waited one {{ waited_failed_task_name }}."
             success_msg: "Failed Task is the waited one"
