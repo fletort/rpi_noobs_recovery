@@ -15,6 +15,8 @@ lint: |
   flake8    
 provisioner:
   name: ansible
+  options:
+    skip-tags: molecule-converge-notest
   playbooks:
     prepare: ../resources/prepare.yml
     converge: ../resources/converge_catch.yml
@@ -45,3 +47,19 @@ verifier:
   options:
     v: true
   directory: ../resources/tests_err/
+
+scenario:
+  test_sequence:
+    #- dependency
+    - lint
+    - cleanup
+    - destroy
+    #- syntax
+    - create
+    - prepare
+    - converge
+    #- idempotence
+    #- side_effect
+    - verify
+    - cleanup
+    - destroy

@@ -15,6 +15,8 @@ lint: |
   flake8    
 provisioner:
   name: ansible
+  options:
+    skip-tags: molecule-converge-notest
   playbooks:
     prepare: ../resources/prepare.yml
     converge: ../resources/converge.yml
