@@ -2,7 +2,14 @@
 
 ## [Unreleased](https://github.com/fletort/rpi-noobs-recovery/tree/HEAD)
 
-[Full Changelog](https://github.com/fletort/rpi-noobs-recovery/compare/v1.0.1...HEAD)
+[Full Changelog](https://github.com/fletort/rpi-noobs-recovery/compare/v1.0.2...HEAD)
+
+## [Unreleased](https://github.com/fletort/rpi-noobs-recovery/tree/HEAD)
+
+[Full Changelog](https://github.com/fletort/rpi-noobs-recovery/compare/v1.0.1...v1.0.2)
+
+**Closed issues:**
+- #3: Workaround to use this role from a molecule driver
 
 ## [v1.0.1](https://github.com/fletort/rpi-noobs-recovery/tree/v1.0.1) (2020-11-19)
 
