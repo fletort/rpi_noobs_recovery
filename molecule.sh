@@ -13,6 +13,7 @@ if [ "$1" = "shell" ] ; then
         -v $(pwd):/tmp/$(basename "${PWD}") \
         -v /var/run/docker.sock:/var/run/docker.sock \
         -v ~/.cache/:/root/.cache/ \
+        -v ~/.ssh:/root/.ssh \
         -w /tmp/$(basename "${PWD}") \
         -e HOST_PWD=${PWD} \
         --name molecule \
@@ -23,6 +24,7 @@ else
         -v $(pwd):/tmp/$(basename "${PWD}") \
         -v /var/run/docker.sock:/var/run/docker.sock \
         -v ~/.cache/:/root/.cache/ \
+        -v ~/.ssh:/root/.ssh \
         -w /tmp/$(basename "${PWD}") \
         -e HOST_PWD=${PWD} \
         --name molecule \
@@ -47,6 +49,10 @@ fi
 # -v ~/.cache/:/root/.cache/
 # This option is used to keep molecule context  (all molecule cache files)
 # between successive creation/execution/deletion of the molecule container.
+#
+# -v ~/.ssh:/root/.ssh
+# This option is used to get all ssh context (known hosts, keys)
+# of the host.
 #
 # -e HOST_PWD=$(PWD)
 # This option is usefull to have the Host current Working Directroy information
