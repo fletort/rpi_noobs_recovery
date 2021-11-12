@@ -24,6 +24,7 @@
   file:
     path: "{{ requested_os_dest }}"
     state: directory
+    mode: u=rw,g=r,o=r
 
 - name: Fill the OS Destination Directory
   block:
@@ -112,7 +113,8 @@
       when: (ansible_failed_task.name  == "Extract Marketing tarball")
       failed_when: true
 
-    - debug:
+    - name: Message
+      debug:
         msg: "This failure is not managed rethrow it."
 
     - name: "{{ ansible_failed_task.name }}"
