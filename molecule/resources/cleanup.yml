@@ -7,3 +7,4 @@
       docker_container:
         name: noobs_repo
         state: absent
+        container_default_behavior: "{{ 'compatibility' if ansible_version.full is version_compare('2.10', '>=') else omit }}"

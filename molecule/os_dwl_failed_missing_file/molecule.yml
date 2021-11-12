@@ -8,6 +8,7 @@ platforms:
     image: python:3-alpine
     networks:
       - name: molecule-test
+    network_mode: molecule-test
 lint: |
   set -e
   yamllint .
