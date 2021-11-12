@@ -18,5 +18,3 @@ def rpi_hostnames():
 def test_removed_known_host(host, rpi_hostnames):
     for rpi_host in rpi_hostnames:
         host.run_expect([1], f"ssh-keygen -F {rpi_host}")
-
-

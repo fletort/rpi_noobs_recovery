@@ -63,6 +63,10 @@
     # This is used to test that existing know host is remove by the role 
     # (as in docker connection mode, the key is not added during the connection,
     # we do it here manually)
+    - name: Add openssh-client if not installed locally
+      package:
+        name: openssh-client
+        state: present
     - name: Simulate an added key
       known_hosts:
         name: rpi
@@ -81,6 +85,7 @@
       file:
         path: /root/.ssh
         state: directory
+        mode: u=rwx
     - name: Simulate an added key
       known_hosts:
         name: rpi

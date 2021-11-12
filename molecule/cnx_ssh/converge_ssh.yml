@@ -25,7 +25,7 @@
       # when molecule is executed in a container
       when: (ansible_facts.virtualization_type is defined) and (ansible_facts.virtualization_type == 'docker')
 
-- name: Converge
+- name: Create SSH Cnx context to make Converge
   hosts: all
   tasks:
     - name: Ensure group "all_ssh" exists
@@ -48,4 +48,4 @@
   tasks:
     - name: "Include rpi-noobs-recovery"
       include_role:
-        name: "rpi-noobs-recovery"
+        name: "rpi_noobs_recovery"
