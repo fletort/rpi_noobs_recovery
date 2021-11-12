@@ -4,4 +4,4 @@
   tasks:
     - name: "Include rpi-noobs-recovery"
       include_role:
-        name: "rpi-noobs-recovery"
+        name: "rpi_noobs_recovery"

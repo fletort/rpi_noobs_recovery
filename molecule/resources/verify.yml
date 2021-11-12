@@ -2,5 +2,6 @@
 - name: Verify
   hosts: all
   tasks:
-    - debug:
+    - name: VERIFY
+      debug:
         msg: "{{ ansible_facts }}"

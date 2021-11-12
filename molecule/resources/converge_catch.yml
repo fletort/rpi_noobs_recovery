@@ -3,9 +3,9 @@
   hosts: all
   tasks:
     - block:
-        - name: "Include rpi-noobs-recovery"
+        - name: "Include rpi_noobs_recovery"
           include_role:
-            name: "rpi-noobs-recovery"
+            name: "rpi_noobs_recovery"
       rescue:
 
         - name: Stop here if failure are not waited/tested on this scenario/host.
@@ -20,20 +20,23 @@
         - name: ReDefine role constant variable to can use ansible_failed_task (linked to ansible issue 49942)
           include_vars:
             file: ../../vars/main.yml
+          when: "ansible_version.full is version_compare('2.10.8', '<')"
 
         # Need to define also some internal task variable
         # when failing in a task with a loop item variable must be defined
         # the problem, is when this item is a dictionnary, attributed accessed from 
-        # the task must also be defined. Difficult to find a dynamic workaround for that....
+        # the task must also be defined. Difficult to find a generic workaround for that....
         # see bug https://github.com/ansible/ansible/issues/57399
         - name: Define item variable to can use ansible_failed_task (linked to ansible issue 57399)
           set_fact:
             item: {attribute: "os_info", dest: "_"}
+          when: "ansible_version.full is version_compare('2.10.8', '<')"
 
         - name: Save Failure Information To Manage them from verify step
           copy:
             content: '{"task_name": "{{ ansible_failed_task.name }}", "return": {{ ansible_failed_result }} }'
             dest: "{{ lookup('env', 'MOLECULE_EPHEMERAL_DIRECTORY') }}/failure_{{ inventory_hostname }}.json"
+            mode: u=rw,g=r,o=r
           when: (test_failure_from_converge is not defined) or (not test_failure_from_converge)
           changed_when: "'molecule-idempotence-notest' not in ansible_skip_tags"
           delegate_to: localhost

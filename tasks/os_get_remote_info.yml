@@ -9,6 +9,7 @@
       file:
         path: /tmp/noobs_os_info
         state: directory
+        mode: u=rw,g=r,o=r
       register: temp_dir
 
     - name: Download repo server information

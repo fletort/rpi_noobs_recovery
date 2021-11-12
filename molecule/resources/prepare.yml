@@ -6,6 +6,7 @@
       copy:
         src: "{{ test_noobs_partition | default('noobs_partition/', True) }}"
         dest: /mnt/
+        mode: u=r,g=r,o=r
 
     - name: Alter noobs_repo_server variable when molecule is executed on the host
       # Remote Info download is delegated to localhost. This one needs to be able to download os list
@@ -21,7 +22,6 @@
   hosts: localhost
   connection: local
   tasks:
-
     - name: Start NOOBS Repository container
       docker_container:
         name: noobs_repo
@@ -36,6 +36,9 @@
         networks_cli_compatible: yes
         networks:
           - name: molecule-test
+        network_mode: molecule-test
+        container_default_behavior: "{{ 'compatibility' if ansible_version.full is version_compare('2.10', '>=') else omit }}"
+
       register: result
       vars:
         molecule_in_docker: (ansible_facts.virtualization_type is defined) and (ansible_facts.virtualization_type == 'docker')

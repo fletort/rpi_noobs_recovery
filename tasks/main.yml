@@ -38,6 +38,7 @@
   copy:
     content: ""
     dest: "{{ raspos_ssh_file_path }}"
+    mode: u=rw,g=r,o=r
 
 - name: Update NOOBS command line to force install
   include_tasks: cmdline_add_option.yml
