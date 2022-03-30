@@ -11,6 +11,8 @@ platforms:
     # if molecule inside container use HOST_PWD as base directory
     # if molecule is executed natively, use MOLECULE_PROJECT_DIRECTORY as base directory
       - ${HOST_PWD:-$MOLECULE_PROJECT_DIRECTORY}/molecule/resources/files/entrypoint.d/:/etc/entrypoint.d/:ro
+      - ${HOST_PWD:-$MOLECULE_PROJECT_DIRECTORY}/molecule/resources/files/fake_boot_time/:/fake_boot_time/:ro
+      - ${HOST_PWD:-$MOLECULE_PROJECT_DIRECTORY}/molecule/resources/files/keys/:/etc/ssh/keys/:rw
     networks:
       - name: molecule-test
     env:
@@ -26,6 +28,7 @@ provisioner:
   name: ansible
   options:
     skip-tags: molecule-converge-notest
+    #tags: molecule-converge-stub-reboot
   playbooks:
     prepare: ../resources/prepare.yml
     converge: converge_ssh.yml
@@ -33,6 +36,9 @@ provisioner:
   inventory:
     host_vars:
       rpi:
+        # Specific test: force custom boot_time_command for reboot module over container
+        molecule_boot_time_command: "cat /fake_boot_time/boot_id"
+
         # Some action are taken about this variable in prepare.yml depending
         # the molecule execution context (natively or from docker container)
         noobs_repo_server: "http://noobs_repo:8080/os_list.json"
@@ -44,7 +50,20 @@ provisioner:
         waited_os_dir: "raspios_lite_armhf"
         waited_os_date: "2020-08-20"
 verifier:
-  name: testinfra
-  options:
-    v: true
-  directory: ../resources/tests/
+  name: ansible
+
+scenario:
+  test_sequence:
+    - dependency
+    - lint
+    - cleanup
+    - destroy
+    - syntax
+    - create
+    - prepare
+    - converge
+    #- idempotence
+    #- side_effect
+    - verify
+    - cleanup
+    - destroy

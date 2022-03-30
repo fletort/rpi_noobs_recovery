@@ -3,7 +3,7 @@
   hosts: localhost
   connection: local
   tasks:
-    - name: Prepare - Patch Needed if molecule is executed in docker
+    - name: Prepare - Patch Needed if molecule is executed in docker (new container betwwen prepare and converge step)
       block:
         # Remote Info download is delegated to localhost. This one needs to be able to download os list
         # SSH Connection to rpi is made by localhost. THis one needs to access rpi machine.
@@ -16,7 +16,7 @@
               - molecule
             appends: yes
 
-        # Usefull only for docker use (in case that container is created on converge step)
+        # Usefull only for docker use (in case that molecule container is re-created on converge step)
         - name: Install sshpass
           package:
             name: sshpass

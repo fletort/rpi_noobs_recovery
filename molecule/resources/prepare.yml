@@ -19,7 +19,7 @@
       # localhost port
       set_fact:
         noobs_repo_server: "{{ noobs_repo_server | regex_replace('noobs_repo:8080', 'localhost:'+lookup('env', 'HOST_PORT') | default('8080', True)) }}"
-      when: (hostvars['localhost'].ansible_facts.virtualization_type is not defined) or (hostvars['localhost'].ansible_facts.virtualization_type != 'docker')
+      when: (hostvars['localhost'].ansible_facts.virtualization_type is not defined) or (hostvars['localhost'].ansible_facts.virtualization_type != 'docker')    
 
 - name: Prepare - Localhost Actions
   hosts: localhost
@@ -73,6 +73,13 @@
         key: rpi ssh-rsa ASDeararAIUHI324324
         state: present
       when: lookup('env', 'MOLECULE_SCENARIO_NAME') != "cnx_ssh"
+
+    # On the SSH test, we need to manage Reboot Module over Container
+    # playbook_dir is the path of the current prepare playbook
+    - name: Start RebootStubDeamon
+      shell: "{{ playbook_dir }}/stub_reboot_container.py {{ playbook_dir }}/files/fake_boot_time/boot_id {{ playbook_dir }}/files/keys &"
+      register: result
+      changed_when: result.rc == 0
 
 - name: Prepare SSH Client(s)
   hosts: client_ssh

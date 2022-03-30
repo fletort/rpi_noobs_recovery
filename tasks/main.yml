@@ -61,7 +61,8 @@
     reboot_timeout: 1200
     pre_reboot_delay: 0
     post_reboot_delay: 30
-  tags: molecule-converge-notest
+    boot_time_command: "{{ molecule_boot_time_command | default(omit) }}"
+  #tags: molecule-idempotence-notest
 
-- name: Remove deprecated known Host
-  include_tasks: ssh_known_host.yml
+# - name: Remove deprecated known Host
+#   include_tasks: ssh_known_host.yml

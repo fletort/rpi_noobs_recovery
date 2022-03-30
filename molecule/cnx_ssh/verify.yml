@@ -1,0 +1,25 @@
+- name: Create SSH Cnx context to make Converge
+  hosts: all
+  tasks:
+    - name: Ensure group "all_ssh" exists
+      group:
+        name: all_ssh
+        state: present
+
+    - name: Add docker host to ssh test group
+      add_host:
+        groups: all_ssh
+        name: "{{ inventory_hostname }}"
+        ansible_host: "{{ ansible_host }}"
+        ansible_connection: ssh
+        ansible_user: root
+        ansible_password: root
+        ansible_ssh_common_args: ''
+        #ansible_ssh_extra_args: '-o StrictHostKeyChecking=yes'
+      changed_when: false
+
+- name: Verify
+  hosts: all_ssh
+  tasks:
+    - name: Test SSH Connexion
+      ping:
